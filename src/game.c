@@ -3,6 +3,7 @@
 #include "core/assert.h"
 #include "core/log.h"
 #include "core/input.h"
+#include "core/threads.h"
 
 #include "states/main_state.h"
 
@@ -21,6 +22,9 @@ static void State_Render();
 static void PollEvents();
 static void Render();
 
+static void CursorPosCallback(GLFWwindow *window, double xpos, double ypos);
+static void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset);
+
 bool InitGame()
 {
     bool success = true;
@@ -33,7 +37,14 @@ bool InitGame()
     }
 
     g_Game.is_running = false;
+    g_Game.fps = 0;
+
+    g_Game.scroll_x = 0;
+    g_Game.scroll_y = 0;
+    g_Game.cursor_pos_x = 0;
+    g_Game.cursor_pos_y = 0;
     memset(g_Game.prev_keys, 0, sizeof(g_Game.prev_keys));
+    memset(g_Game.prev_mouse_buttons, 0, sizeof(g_Game.prev_mouse_buttons));
 
     g_Game.requested_state = -1;
     game_states[STATE_INDEX_MAINSTATE] = GetMainState();
@@ -64,6 +75,11 @@ bool InitGame()
         goto end;
     }
 
+    glfwSetCursorPosCallback(g_Game.window, CursorPosCallback);
+    glfwSetScrollCallback(g_Game.window, ScrollCallback);
+
+    GL_CALL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+
     {
         Error e = StackAllocator_Init(&g_Game.resource_stack, RESOURCE_STACK_SIZE);
         if (e != RGE_NO_ERROR)
@@ -92,8 +108,27 @@ void RunGame()
 {
     g_Game.is_running = true;
 
+    unsigned int frames = 0;
+    double frame_counter = 0;
+
+    double prev_time = glfwGetTime();
+
     while (g_Game.is_running)
     {
+        double now = glfwGetTime();
+        double dt = now - prev_time;
+        prev_time = now;
+
+        frame_counter += dt;
+
+        if (frame_counter >= 1.0)
+        {
+            LogInfo("FPS: %u", frames);
+            g_Game.fps = frames;
+            frames = 0;
+            frame_counter = 0;
+        }
+
         if (g_Game.requested_state >= 0)
         {
             ASSERT(g_Game.requested_state < STATE_INDEX_COUNT);
@@ -109,14 +144,20 @@ void RunGame()
                 LogFatal("Failed to initialise state!");
                 break;
             }
+
+            g_Game.requested_state = -1;
         }
 
         PollEvents();
 
         State_ProcessInput();
-        State_Update(0);
+        State_Update(dt);
 
         Render();
+
+        ++frames;
+
+        Thread_Yield();
     }
 }
 
@@ -130,9 +171,17 @@ void TerminateGame()
 
 static void PollEvents()
 {
+    g_Game.scroll_x = 0;
+    g_Game.scroll_y = 0;
+
     for (int i = 0; i < GLFW_KEY_LAST+1; i++)
     {
         g_Game.prev_keys[i] = GetKey(i);
+    }
+
+    for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST+1; i++)
+    {
+        g_Game.prev_mouse_buttons[i] = GetMouseButton(i);
     }
 
     glfwPollEvents();
@@ -145,9 +194,23 @@ static void PollEvents()
 
 static void Render()
 {
+    glClear(GL_COLOR_BUFFER_BIT);
+
     State_Render();
 
     glfwSwapBuffers(g_Game.window);
+}
+
+static void CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
+{
+    g_Game.cursor_pos_x = (int)xpos;
+    g_Game.cursor_pos_y = (int)ypos;
+}
+
+static void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
+{
+    g_Game.scroll_x = (float)xoffset;
+    g_Game.scroll_y = (float)yoffset;
 }
 
 static bool State_Init()
@@ -182,7 +245,7 @@ static void State_Update(float dt)
 {
     if (g_Game.state.update)
     {
-        g_Game.state.update(&g_Game.state_data, dt);
+        g_Game.state.update(g_Game.state_data, dt);
     }
 }
 
@@ -190,6 +253,6 @@ static void State_Render()
 {
     if (g_Game.state.render)
     {
-        g_Game.state.render(&g_Game.state_data);
+        g_Game.state.render(g_Game.state_data);
     }
 }

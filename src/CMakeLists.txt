@@ -15,12 +15,16 @@ set(
     core/memory.h
     core/memory.c
     core/state.h
+    core/threads.h
+    core/threads.c
 
     allocators/stack_allocator.h
     allocators/stack_allocator.c
 
     graphics/gl.h
     graphics/gl.c
+    graphics/shader.h
+    graphics/shader.c
 
     states/main_state.h
     states/main_state.c

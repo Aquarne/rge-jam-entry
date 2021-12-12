@@ -22,7 +22,13 @@ struct Game
     State state;
     void *state_data;
     int requested_state;
+    int cursor_pos_x;
+    int cursor_pos_y;
+    float scroll_x;
+    float scroll_y;
+    unsigned int fps;
     bool prev_keys[GLFW_KEY_LAST+1];
+    bool prev_mouse_buttons[GLFW_MOUSE_BUTTON_LAST+1];
     bool is_running;
 };
 
