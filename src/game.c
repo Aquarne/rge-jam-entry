@@ -5,6 +5,8 @@
 #include "core/input.h"
 #include "core/threads.h"
 
+#include "graphics/renderer2d.h"
+
 #include "states/main_state.h"
 
 #include <string.h>
@@ -89,7 +91,14 @@ bool InitGame()
             goto end;
         }
     }
-    
+ 
+    if (!Renderer2D_Init())
+    {
+        LogFatal("Failed to initialise 2D Renderer!");
+        success = false;
+        goto end;
+    }   
+
     StackAllocator_SetMarker(&g_Game.resource_stack);
 
     g_Game.state = game_states[0];
@@ -165,6 +174,7 @@ void TerminateGame()
 {
     State_CleanUp();
     StackAllocator_Destroy(&g_Game.resource_stack);
+    Renderer2D_CleanUp();
     glfwDestroyWindow(g_Game.window);
     glfwTerminate();
 }

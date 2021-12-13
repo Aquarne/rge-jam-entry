@@ -25,6 +25,8 @@ set(
     graphics/gl.c
     graphics/shader.h
     graphics/shader.c
+    graphics/renderer2d.h
+    graphics/renderer2d.c
 
     states/main_state.h
     states/main_state.c

@@ -41,17 +41,31 @@ void* StackAllocator_Alloc(StackAllocator *stack, size_t size)
     return block;
 }
 
+void StackAllocator_Free(StackAllocator *stack, size_t size)
+{
+    ASSERT(stack != NULL);
+    ASSERT(size <= (stack->top - stack->bottom));
+
+    stack->top -= size;
+}
+
 void StackAllocator_SetMarker(StackAllocator *stack)
 {
+    ASSERT(stack != NULL);
+
     stack->marker = stack->top;
 }
 
 void StackAllocator_ClearToMarker(StackAllocator *stack)
 {
+    ASSERT(stack != NULL);
+
     stack->top = stack->marker;
 }
 
 void StackAllocator_Clear(StackAllocator *stack)
 {
+    ASSERT(stack != NULL);
+
     stack->top = stack->bottom;
 }
