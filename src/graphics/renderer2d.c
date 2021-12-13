@@ -2,11 +2,13 @@
 #include "shader.h"
 #include "gl.h"
 
+#include "../core/log.h"
+
+#define UNIFORM_LOCATION_COLOR  0
+
 struct Renderer2D
 {
     Shader shader;
-    int loc_color;
-
     unsigned int rect_vao;
     unsigned int rect_vbo;
     unsigned int rect_ibo;
@@ -15,8 +17,6 @@ struct Renderer2D
 bool Renderer2D_Init()
 {
     g_Renderer2D.shader = Shader_Load("shaders/renderer2d.vs", "shaders/renderer2d.fs");
-    
-    GL_CALL(g_Renderer2D.loc_color = glGetUniformLocation(g_Renderer2D.shader, "color"));
 
     const float vertices[] = {
         0.0f, 0.0f,
@@ -59,16 +59,16 @@ void Renderer2D_CleanUp()
 void Renderer2D_DrawRect(int x, int y, int width, int height, u32 color)
 {
     const float normalised_color[] = {
-        (color & 0xFF000000) / 255.0f,
-        (color & 0x00FF0000) / 255.0f,
-        (color & 0x0000FF00) / 255.0f,
-        (color & 0x000000FF) / 255.0f
+        ((color & 0xFF000000) >> 24) / 255.0f,
+        ((color & 0x00FF0000) >> 16) / 255.0f,
+        ((color & 0x0000FF00) >> 8)  / 255.0f,
+        (color & 0x000000FF)         / 255.0f
     };
 
     GL_CALL(glBindVertexArray(g_Renderer2D.rect_vao));
 
     Shader_Bind(g_Renderer2D.shader);
-    GL_CALL(glUniform4fv(g_Renderer2D.loc_color, 4, normalised_color));
+    GL_CALL(glUniform4fv(UNIFORM_LOCATION_COLOR, 1, normalised_color));
 
     GL_CALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
 }

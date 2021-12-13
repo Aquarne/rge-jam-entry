@@ -48,5 +48,5 @@ static void Update(MainState *state, float dt)
 
 static void Render(MainState *state)
 {
-    Renderer2D_DrawRect(0, 0, 100, 100, 0xFFAA00FF);
+    Renderer2D_DrawRect(0, 0, 100, 100, 0xFF5500FF);
 }
