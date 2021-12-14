@@ -59,7 +59,7 @@ bool Renderer2D_Init()
     GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, false, 4 * sizeof(float), (void*)0));
 
     GL_CALL(glEnableVertexAttribArray(1));
-    GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, false, 4 * sizeof(float), (void*)(2 * sizeof(float))));
+    GL_CALL(glVertexAttribPointer(1, 2, GL_FLOAT, false, 4 * sizeof(float), (void*)(2 * sizeof(float))));
 
     GL_CALL(glBindVertexArray(0));
 

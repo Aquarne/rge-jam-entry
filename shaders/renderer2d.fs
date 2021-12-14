@@ -6,7 +6,7 @@ out vec4 frag_color;
 
 layout (location = 0) uniform vec4 color;
 
-uniform sampler2D texture0;
+layout (binding = 0) uniform sampler2D texture0;
 
 void main()
 {

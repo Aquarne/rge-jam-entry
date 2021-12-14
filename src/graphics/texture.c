@@ -27,6 +27,8 @@ bool Texture_Load(const char *path, Texture *texture)
         goto end;
     }
 
+    stbi_set_flip_vertically_on_load(true);
+
     int x, y, channels;
     raw_data = stbi_load_from_memory(compressed_data, (int)size, &x, &y, &channels, 4);
     if (!raw_data)
@@ -37,9 +39,9 @@ bool Texture_Load(const char *path, Texture *texture)
     }
 
     GL_CALL(glBindTexture(GL_TEXTURE_2D, ret.id));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, raw_data));
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, raw_data));
     GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 
     ret.width = x;
