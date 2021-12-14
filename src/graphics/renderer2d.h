@@ -10,5 +10,6 @@ void Renderer2D_SetClearColor(u32 color);
 
 void Renderer2D_Clear();
 void Renderer2D_DrawRect(int x, int y, int width, int height, u32 color);
+void Renderer2D_DrawTexturedRect(int x , int y, int width, int height, u32 color, unsigned int texture_id);
 
 #endif

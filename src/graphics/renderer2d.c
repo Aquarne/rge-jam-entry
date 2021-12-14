@@ -1,6 +1,7 @@
 #include "renderer2d.h"
-#include "shader.h"
 #include "gl.h"
+#include "shader.h"
+#include "texture.h"
 
 #include "../game.h"
 
@@ -31,10 +32,11 @@ bool Renderer2D_Init()
     );
 
     const float vertices[] = {
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f
+        // Position.    // Texture coords.
+        0.0f, 0.0f,     0.0f, 1.0f,
+        1.0f, 0.0f,     1.0f, 1.0f,
+        1.0f, 1.0f,     1.0f, 0.0f,
+        0.0f, 1.0f,     0.0f, 0.0f
     };
 
     const unsigned int indices[] = {
@@ -54,7 +56,10 @@ bool Renderer2D_Init()
     GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
 
     GL_CALL(glEnableVertexAttribArray(0));
-    GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, false, 2 * sizeof(float), (void*)0));
+    GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, false, 4 * sizeof(float), (void*)0));
+
+    GL_CALL(glEnableVertexAttribArray(1));
+    GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, false, 4 * sizeof(float), (void*)(2 * sizeof(float))));
 
     GL_CALL(glBindVertexArray(0));
 
@@ -85,10 +90,16 @@ void Renderer2D_Clear()
 
 void Renderer2D_DrawRect(int x, int y, int width, int height, u32 color)
 {
+    Renderer2D_DrawTexturedRect(x, y, width, height, color, 0);
+}
+
+
+void Renderer2D_DrawTexturedRect(int x , int y, int width, int height, u32 color, unsigned int texture_id)
+{
     mat4 model;
     glm_mat4_identity(model);
-    glm_scale(model, (vec3) { (float)width, (float)height, 0.0f });
     glm_translate(model, (vec3) { (float)x, (float)y, 0.0f });
+    glm_scale(model, (vec3) { (float)width, (float)height, 0.0f });
 
     const vec4 normalised_color = {
         ((color & 0xFF000000) >> 24) / 255.0f,
@@ -103,6 +114,8 @@ void Renderer2D_DrawRect(int x, int y, int width, int height, u32 color)
     GL_CALL(glUniform4fv(UNIFORM_LOCATION_COLOR, 1, normalised_color));
     GL_CALL(glUniformMatrix4fv(UNIFORM_LOCATION_MODEL, 1, false, (float*)model));
     GL_CALL(glUniformMatrix4fv(UNIFORM_LOCATION_PROJECTION, 1, false, (float*)g_Renderer2D.projection));
+
+    Texture_Bind(texture_id, 0);
 
     GL_CALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
 }

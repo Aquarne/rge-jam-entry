@@ -107,6 +107,7 @@ bool InitGame()
     if (!State_Init())
     {
         LogFatal("Failed to initialise main state!");
+        success = false;
     }
 
 end:

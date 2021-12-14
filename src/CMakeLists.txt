@@ -8,6 +8,8 @@ set(
     core/defs.h
     core/error.h
     core/error.c
+    core/file.h
+    core/file.c
     core/input.h
     core/input.c
     core/log.h
@@ -25,6 +27,8 @@ set(
     graphics/gl.c
     graphics/shader.h
     graphics/shader.c
+    graphics/texture.h
+    graphics/texture.c
     graphics/renderer2d.h
     graphics/renderer2d.c
 
@@ -41,6 +45,7 @@ set(
     "${PROJECT_SOURCE_DIR}/vendors/cglm/include"
     "${PROJECT_SOURCE_DIR}/vendors/glad/include"
     "${PROJECT_SOURCE_DIR}/vendors/glfw/include"
+    "${PROJECT_SOURCE_DIR}/vendors/stb/include"
 )
 
 set(
@@ -48,6 +53,7 @@ set(
     cglm_headers
     glad
     glfw
+    stb_image
 )
 
 set(

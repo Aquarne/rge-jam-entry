@@ -10,3 +10,6 @@ add_subdirectory(glad)
 
 # GLFW
 add_subdirectory(glfw)
+
+# stb
+add_subdirectory(stb)
