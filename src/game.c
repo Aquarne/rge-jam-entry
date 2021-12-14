@@ -80,8 +80,6 @@ bool InitGame()
     glfwSetCursorPosCallback(g_Game.window, CursorPosCallback);
     glfwSetScrollCallback(g_Game.window, ScrollCallback);
 
-    GL_CALL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-
     {
         Error e = StackAllocator_Init(&g_Game.resource_stack, RESOURCE_STACK_SIZE);
         if (e != RGE_NO_ERROR)
@@ -97,7 +95,9 @@ bool InitGame()
         LogFatal("Failed to initialise 2D Renderer!");
         success = false;
         goto end;
-    }   
+    }
+
+    Renderer2D_SetClearColor(0xFFFFFFFF);
 
     StackAllocator_SetMarker(&g_Game.resource_stack);
 
@@ -204,7 +204,7 @@ static void PollEvents()
 
 static void Render()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    Renderer2D_Clear();
 
     State_Render();
 

@@ -38,12 +38,14 @@ set(
 
 set(
     INCLUDE_DIRS
+    "${PROJECT_SOURCE_DIR}/vendors/cglm/include"
     "${PROJECT_SOURCE_DIR}/vendors/glad/include"
     "${PROJECT_SOURCE_DIR}/vendors/glfw/include"
 )
 
 set(
     LIBRARIES
+    cglm_headers
     glad
     glfw
 )
